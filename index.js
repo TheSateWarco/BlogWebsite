@@ -11,6 +11,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 let blogs = [
   {
+    id: Date.now().toString() + "0",
     title: "Kingdom of Influence - KOI",
     author: "TheSateWarco",
     category: "Technology",
@@ -18,6 +19,7 @@ let blogs = [
     recent: new Date()
   },
   {
+    id: (Date.now() + 1).toString(),
     title: "The Rise of Kyoshi - Review",
     author: "TheSateWarco",
     category: "Book Reviews",
@@ -47,6 +49,39 @@ app.post("/submit", (req, res) => {
   res.redirect("/");
 });
 
+app.post("/delete/:id", (req, res) => {
+  const id = req.params.id;
+  blogs = blogs.filter(blog => blog.id !== id);
+  res.redirect("/");
+});
+
+
 app.listen(port, () => {
   console.log(`Listening on port ${port}`);
 });
+
+
+app.get("/edit/:id", (req, res) => {
+  const id = req.params.id;
+  const editIndex = blogs.findIndex(blog => blog.id === id);
+  res.render("index", { blogs, editIndex });
+});
+
+
+app.post("/edit/:id", (req, res) => {
+  const id = req.params.id;
+  const i = blogs.findIndex(blog => blog.id === id);
+  const { title, author, category, text } = req.body;
+
+  blogs[i] = {
+    ...blogs[i],
+    title,
+    author,
+    category,
+    text,
+    recent: new Date()
+  };
+
+  res.redirect("/");
+});
+
