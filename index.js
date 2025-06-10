@@ -1,5 +1,5 @@
-// set up
 
+// set up
 const express = require("express");
 const bodyParser = require("body-parser");
 const path = require("path");
@@ -11,10 +11,10 @@ app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// premade blogs
+// premasde blogs
 let blogs = [
   {
-    id: Date.now().toString() + "0",
+    id: Date.now().toString() + "0",  
     title: "Kingdom of Influence - KOI",
     author: "TheSateWarco",
     category: "Technology",
@@ -22,7 +22,7 @@ let blogs = [
     recent: new Date()
   },
   {
-    id: (Date.now() + 1).toString(),
+    id: (Date.now() + 1).toString(), 
     title: "The Rise of Kyoshi - Review",
     author: "TheSateWarco",
     category: "Book Reviews",
@@ -31,12 +31,15 @@ let blogs = [
   }
 ];
 
+
+
 // get all blogs
 app.get("/", (req, res) => {
-  res.render("index", { blogs });
+  const sortedBlogs = [...blogs].sort((a, b) => b.recent - a.recent); 
+  res.render("index", { blogs: sortedBlogs });
 });
 
-// add new blog
+// send new data from the form to server
 app.post("/submit", (req, res) => {
   const { newTitle, newAuthor, newCategory, newText } = req.body;
 
@@ -53,26 +56,26 @@ app.post("/submit", (req, res) => {
   res.redirect("/");
 });
 
-// delete the blog of the specific id of delete button (date turned into string)
+// set the deleted data (get rid of data basically) to server
 app.post("/delete/:id", (req, res) => {
   const id = req.params.id;
   blogs = blogs.filter(blog => blog.id !== id);
   res.redirect("/");
 });
 
-// startand wait for requerst
+// start server
 app.listen(port, () => {
   console.log(`Listening on port ${port}`);
 });
 
-// get the id of the blog with the edit button
+// get ingo from the blogs to edit
 app.get("/edit/:id", (req, res) => {
   const id = req.params.id;
   const editIndex = blogs.findIndex(blog => blog.id === id);
   res.render("index", { blogs, editIndex });
 });
 
-// post the new edited blog
+// add the nmew edited data to server
 app.post("/edit/:id", (req, res) => {
   const id = req.params.id;
   const i = blogs.findIndex(blog => blog.id === id);
