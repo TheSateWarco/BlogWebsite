@@ -1,3 +1,5 @@
+// set up
+
 const express = require("express");
 const bodyParser = require("body-parser");
 const path = require("path");
@@ -9,6 +11,7 @@ app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// premade blogs
 let blogs = [
   {
     id: Date.now().toString() + "0",
@@ -28,11 +31,12 @@ let blogs = [
   }
 ];
 
+// get all blogs
 app.get("/", (req, res) => {
   res.render("index", { blogs });
 });
 
-
+// add new blog
 app.post("/submit", (req, res) => {
   const { newTitle, newAuthor, newCategory, newText } = req.body;
 
@@ -49,25 +53,26 @@ app.post("/submit", (req, res) => {
   res.redirect("/");
 });
 
+// delete the blog of the specific id of delete button (date turned into string)
 app.post("/delete/:id", (req, res) => {
   const id = req.params.id;
   blogs = blogs.filter(blog => blog.id !== id);
   res.redirect("/");
 });
 
-
+// startand wait for requerst
 app.listen(port, () => {
   console.log(`Listening on port ${port}`);
 });
 
-
+// get the id of the blog with the edit button
 app.get("/edit/:id", (req, res) => {
   const id = req.params.id;
   const editIndex = blogs.findIndex(blog => blog.id === id);
   res.render("index", { blogs, editIndex });
 });
 
-
+// post the new edited blog
 app.post("/edit/:id", (req, res) => {
   const id = req.params.id;
   const i = blogs.findIndex(blog => blog.id === id);
