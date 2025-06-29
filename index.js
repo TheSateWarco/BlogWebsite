@@ -6,13 +6,12 @@ const path = require("path");
 
 const app = express();
 const port = 3000;
-app.set('views', path.join(__dirname, 'private'));
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // premasde blogs
-let blogs = [
+/*let blogs = [
   {
     id: Date.now().toString() + "0",  
     title: "Kingdom of Influence - KOI",
@@ -93,3 +92,21 @@ app.post("/edit/:id", (req, res) => {
   res.redirect("/");
 });
 
+*/
+
+// start server
+app.listen(port, () => {
+  console.log(`Listening on port ${port}`);
+});
+
+app.get("/", (req, res) => {
+  res.render("index");
+});
+// Routes for Sign In and Sign Up
+app.get("/signin", (req, res) => {
+  res.render("signin"); 
+});
+
+app.get("/signup", (req, res) => {
+  res.render("signup");
+});
