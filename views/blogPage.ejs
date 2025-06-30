@@ -1,0 +1,43 @@
+<%- include("header") %>
+
+<main>
+  <!-- Blog Form -->
+  <button id="toggleFormBtn">Add Blog</button>
+  <div id="blogForm" style="display:none;">
+    <h2>New Blog</h2>
+    <form action="/submit" method="POST">
+      <input type="text" name="newTitle" placeholder="Title" required>
+
+      <!-- Automatically set author info -->
+      <input type="hidden" name="creator_name" value="<%= user.name %>">
+      <input type="hidden" name="creator_user_id" value="<%= user.user_id %>">
+
+      <textarea name="newText" placeholder="Content" rows="4" required></textarea>
+      <button type="submit">Post</button>
+    </form>
+  </div>
+
+  <section id="blogPosts">
+    <% blogs.forEach(function(post) { %>
+      <div class="blog">
+        <h2><%= post.title %></h2>
+        <p><strong>Author:</strong> <%= post.creator_name %></p>
+        <p><strong>Created:</strong> <%= new Date(post.date_created).toLocaleString() %></p>
+        <p><%= post.body %></p>
+
+        <% if (user && post.creator_user_id === user.user_id) { %>
+          <!-- Only show Edit/Delete for post owner -->
+          <form action="/edit/<%= post.blog_id %>" method="get" style="display:inline;">
+            <button type="submit">Edit</button>
+          </form>
+          <form action="/delete/<%= post.blog_id %>" method="post" style="display:inline;">
+            <button type="submit" onclick="return confirm('Are you sure?')">Delete</button>
+          </form>
+        <% } %>
+      </div>
+    <% }); %>
+  </section>
+</main>
+
+<script src="/buttons.js"></script>
+<%- include("footer") %>
