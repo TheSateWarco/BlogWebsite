@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blog Website - Sign In</title>
+  <link rel="stylesheet" href="/main.css" />
+</head>
+<body>
+  <!--i dont want to mae another doc so heres some script stuff :)-->
+  <script>
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("error") === "1") {
+    alert("Invalid user ID or password.");
+  } else if (params.get("error") === "2") {
+    alert("Server error. Try again later.");
+  }
+</script>
+  <header>
+    <h1>Sign In</h1>
+<form method="POST" action="/signin">
+    <input type="text" name="user_id" placeholder="UserID" required />
+    <input type="password" name="password" placeholder="Password" required />
+    <button type="submit">Login</button>
+  </form>
+  </header>
+</body>
+</body>
+
+</html>

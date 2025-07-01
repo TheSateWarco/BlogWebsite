@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blog Website - Sign Up</title>
+  <link rel="stylesheet" href="/main.css" />
+</head>
+  <!--i dont want to mae another doc so heres some script stuff :)-->
+  <script>
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("error") === "1") {
+    alert("UserID already taken - Try Again");
+  } else if (params.get("error") === "2") {
+    alert("Server error. Try again later.");
+  }
+</script>
+<body>
+  <header>
+    <h1>Sign Up</h1>
+  <form method="POST" action="/signup">
+    <input type="text" name="name" placeholder="Username" required />
+    <input type="text" name="user_id" placeholder="UserID (will not be shown)" required />
+    <input type="password" name="password" placeholder="Password" required />
+    <button type="submit">Register</button>
+  </form>
+  </header>
+</body>
+</body>
+
+</html>
