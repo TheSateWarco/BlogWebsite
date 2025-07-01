@@ -99,23 +99,46 @@ app.post("/signup", async (req, res) => {
   }
 });
 
+app.get("/blogPage", async (req, res) => {
+  if (!currentUser) {
+    return res.redirect("/signin");
+  }
+  try {
+    const blogResult = await db.query("SELECT * FROM blogs ORDER BY date_created DESC");
+    res.render("blogPage", { blogs: blogResult.rows, user: currentUser });
+  } catch (err) {
+    console.error(err);
+    res.send("Error loading blogs.");
+  }
+});
+
 app.get("/edit/:id", async (req, res) => {
+  if (!currentUser) return res.redirect("/signin");
+
   const blog_id = req.params.id;
 
   try {
-    const result = await db.query("SELECT * FROM blogs WHERE blog_id = $1", [blog_id]);
-    const blog = result.rows[0];
+    // Load all blogs ordered
+    const blogResult = await db.query("SELECT * FROM blogs ORDER BY date_created DESC");
+    const blogs = blogResult.rows;
 
-    if (!blog) return res.send("Blog not found.");
-    if (!currentUser || currentUser.user_id !== blog.creator_user_id) return res.send("Unauthorized.");
+    // Find blog to edit
+    const editIndex = blogs.findIndex(blog => String(blog.blog_id) === String(blog_id));
 
-    res.render("editBlog", { blog });
+    if (editIndex === -1) return res.send("Blog not found.");
+
+    // Check ownership
+    if (currentUser.user_id !== blogs[editIndex].creator_user_id) {
+      return res.send("Unauthorized to edit this blog.");
+    }
+
+    // Render blogPage with editIndex set
+    res.render("blogPage", { blogs, user: currentUser, editIndex });
   } catch (err) {
     console.error(err);
     res.send("Server error.");
   }
 });
-
 
 app.post("/edit/:id", async (req, res) => {
   const blog_id = req.params.id;
@@ -142,6 +165,27 @@ app.post("/edit/:id", async (req, res) => {
   }
 });
 
+app.post("/submit", async (req, res) => {
+  const { newTitle, newText, creator_name, creator_user_id } = req.body;
+
+  if (!currentUser || currentUser.user_id !== creator_user_id) {
+    return res.send("Unauthorized: You must be signed in.");
+  }
+
+  try {
+    await db.query(
+      "INSERT INTO blogs (title, body, creator_name, creator_user_id, date_created) VALUES ($1, $2, $3, $4, $5)",
+      [newTitle, newText, creator_name, creator_user_id, new Date()]
+    );
+
+    const blogResult = await db.query("SELECT * FROM blogs ORDER BY date_created DESC");
+    res.render("blogPage", { blogs: blogResult.rows, user: currentUser });
+  } catch (err) {
+    console.error(err);
+    res.send("Error saving blog.");
+  }
+});
+
 app.post("/delete/:id", async (req, res) => {
   const blog_id = req.params.id;
 
@@ -154,47 +198,13 @@ app.post("/delete/:id", async (req, res) => {
     }
 
     await db.query("DELETE FROM blogs WHERE blog_id = $1", [blog_id]);
-    res.redirect("/signin");
+    res.redirect("/blogPage");
   } catch (err) {
     console.error(err);
     res.send("Server error.");
   }
 });
 
-/*// send new data from the form to server
-app.post("/submit", (req, res) => {
-  const { newTitle, newAuthor, newCategory, newText } = req.body;
-
-    blogs.push({
-    id: Date.now().toString(), 
-    title: newTitle,
-    author: newAuthor,
-    category: newCategory,
-    text: newText,
-    recent: new Date()
-    });
-
-
-  res.redirect("/");
-});
-
-// set the deleted data (get rid of data basically) to server
-app.post("/delete/:id", (req, res) => {
-  const id = req.params.id;
-  blogs = blogs.filter(blog => blog.id !== id);
-  res.redirect("/");
-});
-
-// start server
-app.listen(port, () => {
-  console.log(`Listening on port ${port}`);
-});
-
-
-
-
-
-*/
 
 // start server
 app.listen(port, () => {
